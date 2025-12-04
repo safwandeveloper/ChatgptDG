@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPTDG</title>
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="Logo.png">
+    <!-- Library for PNG Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #10a37f; 
+            --primary-hover: #0d8a6c;
+            
+            /* Light Mode Colors */
+            --bg: #f4f4f9;
+            --container-bg: #ffffff;
+            --text: #333;
+            --text-secondary: #666;
+            --border: #ddd;
+            --input-bg: #ffffff;
+            --header-bg: #ffffff;
+            --header-text: #333;
+            --shadow: rgba(0,0,0,0.08);
+            --menu-bg: #ffffff;
+            --overlay-bg: rgba(0,0,0,0.5);
+        }
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text: #e0e0e0;
+            --text-secondary: #aaa;
+            --border: #444;
+            --input-bg: #333;
+            --header-bg: #202123;
+            --header-text: #ffffff;
+            --shadow: rgba(0,0,0,0.3);
+            --menu-bg: #202123;
+            --overlay-bg: rgba(0,0,0,0.7);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            width: 100%;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative; 
+            z-index: 100;
+            box-sizing: border-box;
+            transition: background-color 0.3s;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        /* UPDATED LOGO CONTAINER FOR IMAGE */
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            /* Removed background-color to let PNG transparency show */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ICON BUTTONS */
+        .icon-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--header-text);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .icon-btn:hover { background-color: rgba(128, 128, 128, 0.1); transform: scale(1.05); }
+        .icon-btn svg { width: 18px; height: 18px; stroke-width: 2; }
+
+        /* --- SIDEBAR MENU (RIGHT SIDE) --- */
+        .menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--overlay-bg);
+            z-index: 900;
+            opacity: 0; visibility: hidden;
+            transition: 0.3s;
+        }
+        .menu-overlay.open { opacity: 1; visibility: visible; }
+
+        .side-menu {
+            position: fixed; top: 0; right: -300px; 
+            width: 280px; height: 100%;
+            background-color: var(--menu-bg);
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: right 0.3s ease-in-out;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .side-menu.open { right: 0; }
+
+        .menu-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px;
+        }
+        .menu-title { font-weight: bold; font-size: 1.2rem; color: var(--text); }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text); }
+
+        .menu-links { display: flex; flex-direction: column; gap: 10px; }
+        .menu-link {
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 1rem;
+            border-radius: 6px;
+            transition: 0.2s;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .menu-link:hover { background-color: rgba(16, 163, 127, 0.1); color: var(--primary); }
+        .menu-link.active { background-color: var(--primary); color: white; }
+
+        /* Main Container */
+        .container {
+            background: var(--container-bg);
+            width: 95%;
+            max-width: 1100px; 
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+            min-height: 600px;
+        }
+
+        /* --- PAGE SECTIONS --- */
+        .page-section { display: none; animation: fadeIn 0.3s; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-header { padding: 20px 30px; border-bottom: 1px solid var(--border); background-color: var(--container-bg); text-align: left; }
+        .section-header h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--text); line-height: 1.2; }
+
+        /* Content Layouts */
+        .generator-content { display: flex; flex-wrap: wrap; }
+        .input-section { flex: 0 0 350px; padding: 30px; border-right: 1px solid var(--border); background-color: var(--container-bg); overflow-y: auto; max-height: 90vh; }
+        .preview-section { flex: 1; padding: 30px; background-color: var(--bg); min-width: 300px; display: flex; flex-direction: column; }
+
+        .text-content { padding: 40px; color: var(--text); }
+        .text-content h2 { color: var(--primary); margin-top: 30px; font-size: 1.2rem; }
+        .text-content p, .text-content li { color: var(--text-secondary); margin-bottom: 15px; font-size: 1rem; line-height: 1.7; }
+        .highlight-box { background-color: rgba(16, 163, 127, 0.05); border-left: 4px solid var(--primary); padding: 15px 20px; margin: 25px 0; border-radius: 4px; }
+
+        .step-list { list-style: none; padding: 0; }
+        .step-item { display: flex; gap: 15px; margin-bottom: 20px; }
+        .step-number { background-color: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .step-desc { color: var(--text-secondary); }
+        .step-title { font-weight: bold; color: var(--text); display: block; margin-bottom: 5px; }
+
+        /* Form & Buttons */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; color: var(--text); }
+        input[type="text"], input[type="email"], textarea, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; box-sizing: border-box; transition: 0.2s; background-color: var(--input-bg); color: var(--text); }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.1); }
+        input[type="file"] { padding: 6px; background: var(--input-bg); color: var(--text); font-size: 0.9rem; width: 100%; border: 1px solid var(--border); border-radius: 6px; }
+        
+        .btn { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-random { background-color: #f0ad4e; width: 100%; margin-bottom: 20px; }
+        .btn-random:hover { background-color: #ec971f; }
+        .btn-sm { width: auto; padding: 4px 12px; font-size: 0.85rem; background-color: #eee; color: #333; }
+        .btn-sm:hover { background-color: #ddd; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-pdf { background-color: #dc3545; flex: 1; }
+        .btn-pdf:hover { background-color: #c82333; }
+        .btn-png { background-color: #17a2b8; flex: 1; }
+        .btn-png:hover { background-color: #138496; }
+        .btn-copy { background-color: var(--primary); flex: 1; }
+
+        .preview-box { background: white !important; border: 1px solid #e0e0e0; border-radius: 2px; padding: 50px; flex-grow: 1; color: #000 !important; box-shadow: 0 2px 5px rgba(0,0,0,0.05); line-height: 1.5; transform-origin: top center; }
+        
+        .site-footer { text-align: center; padding: 20px; color: var(--text-secondary); font-size: 0.9rem; border-top: 1px solid var(--border); width: 100%; margin-top: auto; }
+
+        /* Document Styles */
+        .memo-header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; font-family: "Times New Roman", Times, serif; }
+        .memo-title { text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .memo-body { font-family: "Times New Roman", Times, serif; font-size: 12pt; }
+        .letter-container { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #000; max-width: 800px; margin: 0 auto; }
+        .letter-head-block { margin-bottom: 40px; text-align: left; }
+        .letter-school-name { font-weight: bold; font-size: 14pt; margin-bottom: 4px; }
+        .letter-address { font-size: 10pt; line-height: 1.4; color: #333; }
+        .letter-date { margin-bottom: 30px; }
+        .letter-salutation { font-weight: bold; margin-bottom: 20px; }
+        .letter-body p { margin-bottom: 15px; text-align: justify; }
+        .letter-signature-block { margin-top: 50px; }
+        .signature-placeholder { font-family: 'Brush Script MT', cursive; font-size: 24pt; color: #000; margin-bottom: 5px; }
+        .paystub-container { font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 40px; background: white; box-sizing: border-box; }
+        .paystub-header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 25px; }
+        .paystub-title { font-size: 22px; font-weight: bold; text-transform: uppercase; color: #2c3e50; }
+        .paystub-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 11pt; }
+        .paystub-table th, .paystub-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .paystub-table th { background-color: #f8f9fa; font-weight: bold; color: #444; }
+        .paystub-total { text-align: right; font-weight: bold; font-size: 1.2em; border-top: 2px solid #333; padding-top: 10px; margin-top: 10px; }
+        .id-card-wrapper { display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .id-card { width: 300px; height: 190px; border: 1px solid #ddd; border-radius: 10px; background: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%); box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; overflow: hidden; font-family: Arial, sans-serif; position: relative; flex-shrink: 0; }
+        .id-left { width: 100px; background-color: var(--primary); display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .id-photo { width: 80px; height: 80px; background-color: #fff; border-radius: 50%; overflow: hidden; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 10px; }
+        .id-right { flex: 1; padding: 15px; display: flex; flex-direction: column; justify-content: center; }
+        .id-school { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 10px; line-height: 1.2; }
+        .id-name { font-size: 16px; font-weight: bold; color: #000; margin-bottom: 5px; }
+        .id-role { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .id-year { position: absolute; bottom: 10px; right: 15px; font-size: 14px; font-weight: bold; color: var(--primary); border: 1px solid var(--primary); padding: 2px 6px; border-radius: 4px; }
+        .cert-container { font-family: "Times New Roman", Times, serif; border: 10px solid #333; padding: 40px; text-align: center; position: relative; color: #000; min-height: 600px; overflow: hidden; background: white; box-sizing: border-box; }
+        .cert-header-logo { text-align: center; margin-bottom: 15px; position: relative; z-index: 2; }
+        .cert-header-logo img { height: 90px; width: auto; }
+        .cert-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60%; opacity: 0.08; pointer-events: none; z-index: 1; display: flex; justify-content: center; align-items: center; user-select: none; }
+        .cert-watermark img { width: 100%; height: auto; }
+        .cert-watermark-text { font-size: 100px; font-weight: bold; color: #000; }
+        .cert-content { position: relative; z-index: 2; }
+        .cert-header-fancy { font-family: 'Old English Text MT', 'Cloister Black', serif; font-size: 48px; color: #2c3e50; margin-bottom: 10px; line-height: 1; }
+        .cert-subheader { font-size: 22px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; display: inline-block; padding-bottom: 5px; }
+        .cert-name { font-size: 32px; font-weight: bold; margin: 30px 0; text-transform: uppercase; }
+        .cert-details { display: flex; justify-content: space-between; margin: 30px 0; text-align: left; font-family: Arial, sans-serif; font-size: 14px; }
+        .cert-col { width: 48%; }
+        .cert-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px;}
+        .cert-label { font-weight: bold; color: #555; }
+        .cert-val { font-weight: bold; }
+        .cert-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: Arial, sans-serif; font-size: 12px; }
+        .cert-table th { border-bottom: 2px solid #000; text-align: left; padding: 5px; }
+        .cert-table td { padding: 8px 5px; border-bottom: 1px solid #eee; }
+        .preview-label { font-weight: bold; margin-bottom: 15px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        @media (max-width: 768px) {
+            .generator-content { flex-direction: column; }
+            .input-section { flex: none; border-right: none; border-bottom: 1px solid var(--border); max-height: none; }
+            .container { margin: 10px 0; border-radius: 0; width: 100%; box-shadow: none; }
+            .preview-section { padding: 10px; }
+            .preview-box { padding: 15px; overflow-x: hidden; }
+            .navbar { padding: 10px 20px; }
+            .id-card-wrapper { width: 100%; transform: scale(1); }
+            @media (max-width: 340px) { .id-card { transform: scale(0.9); transform-origin: left top; } }
+            .cert-container { padding: 15px; border-width: 5px; min-height: auto; }
+            .cert-header-fancy { font-size: 28px; } 
+            .paystub-header { flex-direction: column; }
+            .text-content { padding: 20px; }
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .preview-box, .preview-box * { visibility: visible; }
+            .preview-box { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; border: none; }
+            .cert-watermark { opacity: 0.08 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+
+        #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 100; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 17px; }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR MENU & OVERLAY -->
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+<div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+        <span class="menu-title">Menu</span>
+        <button class="close-btn" onclick="toggleMenu()">×</button>
+    </div>
+    <div class="menu-links">
+        <a href="#" class="menu-link active" onclick="switchPage('home', this)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            Home
+        </a>
+        <a href="#" class="menu-link" onclick="switchPage('how', this)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            How to Use
+        </a>
+        <a href="#" class="menu-link" onclick="switchPage('about', this)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            About Us
+        </a>
+        <a href="#" class="menu-link" onclick="switchPage('privacy', this)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            Privacy Policy
+        </a>
+        <a href="#" class="menu-link" onclick="switchPage('contact', this)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Contact Us
+        </a>
+    </div>
+</div>
+
+<!-- HEADER -->
+<nav class="navbar">
+    <div class="navbar-left" onclick="switchPage('home')">
+        <div class="logo-icon">
+            <!-- REPLACED SVG WITH IMAGE -->
+            <img src="Logo.png" alt="ChatGPTDG Logo" class="logo-img">
+        </div>
+        <span class="nav-title">ChatGPTDG</span>
+    </div>
+    <div class="navbar-right">
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="icon-btn" onclick="toggleMenu()" title="Open Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </div>
+</nav>
+
+<div class="container">
+    
+    <!-- 1. HOME SECTION (GENERATOR) -->
+    <div id="section-home" class="page-section active">
+        <div class="section-header"><h1>ChatGPT Documents Generator</h1></div>
+        <div class="generator-content">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="docType" style="color: var(--primary);">Document Type</label>
+                    <select id="docType" onchange="toggleFields()">
+                        <option value="whitelist">Request IT Whitelisting (Internal)</option>
+                        <option value="verification" selected>Official Letter (Required)</option>
+                        <option value="certificate">Education Certificate (License)</option>
+                        <option value="offer">Signed Job Offer Letter</option>
+                        <option value="paystub">Pay Slip / Pay Stub</option>
+                        <option value="idcard">Teacher ID Card</option>
+                    </select>
+                    <div class="status-badge" id="docBadge">Accepted for Verification</div>
+                </div>
+                <button class="btn btn-random" onclick="randomizeData()">🎲 Auto-Fill Random Data</button>
+                <div class="form-group" id="logoGroup" style="display:none;">
+                    <label id="fileInputLabel" for="logoUpload">School Logo (Optional)</label>
+                    <input type="file" id="logoUpload" accept="image/*" onchange="handleLogoUpload(this)">
+                    <div class="hint" id="fileInputHint">Upload png/jpg for authenticity.</div>
+                </div>
+                <div class="form-group" id="schoolGroup"><label for="schoolName" id="schoolNameLabel">School/Institution Name</label><input type="text" id="schoolName" placeholder="e.g. Lincoln High School" oninput="updatePreview()"></div>
+                <div class="form-group" id="deptGroup" style="display:none;"><label for="department">Department of Education / State</label><input type="text" id="department" placeholder="e.g. State of Indiana" oninput="updatePreview()"></div>
+                <div class="form-group" id="addressGroup"><label for="schoolAddress">School Address</label><textarea id="schoolAddress" style="min-height:60px;" placeholder="e.g. 123 Education Lane&#10;Springfield, IL 62704&#10;Tel: (555) 123-4567" oninput="updatePreview()"></textarea></div>
+                <div class="form-group" id="recipientGroup"><label id="recipientLabel" for="recipientName">Signatory Name (Principal/Head)</label><input type="text" id="recipientName" placeholder="e.g. Dr. Melissa Warren" oninput="updatePreview()"></div>
+                <div class="form-group"><label for="senderName">Teacher Name (You)</label><input type="text" id="senderName" placeholder="e.g. Jane Doe" oninput="updatePreview()"></div>
+                <div class="form-group"><label for="senderTitle">Title / Grade / Subject</label><input type="text" id="senderTitle" placeholder="e.g. High School English Teacher" oninput="updatePreview()"></div>
+                <div id="certFields" style="display:none;">
+                    <div class="form-group"><label>License Number</label><input type="text" id="certLicense" placeholder="e.g. 10187147" oninput="updatePreview()"></div>
+                    <div class="form-group"><label>SPN Number</label><input type="text" id="certSPN" placeholder="e.g. 14889641" oninput="updatePreview()"></div>
+                    <div class="form-group"><label>Issued Date</label><input type="text" id="certIssued" placeholder="e.g. 6/5/2017" oninput="updatePreview()"></div>
+                    <div class="form-group"><label>Expires Date</label><input type="text" id="certExpires" placeholder="e.g. 6/5/2029" oninput="updatePreview()"></div>
+                </div>
+                <div class="form-group" id="useCaseGroup" style="display:none;"><label>Specific Use Case</label><textarea id="useCase" placeholder="e.g. lesson planning..." oninput="updatePreview()"></textarea></div>
+                <button class="btn btn-sm" onclick="resetForm()">Clear Form</button>
+            </div>
+            <div class="preview-section">
+                <div class="preview-label"><span>Document Preview</span></div>
+                <div class="preview-box" id="emailPreview"></div>
+                <div class="btn-group">
+                    <button class="btn btn-pdf" onclick="window.print()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> PDF</button>
+                    <button class="btn btn-png" onclick="downloadPNG()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> PNG</button>
+                    <button class="btn btn-copy" onclick="copyToClipboard()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2-2v1"></path></svg> Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. HOW TO USE SECTION -->
+    <div id="section-how" class="page-section">
+        <div class="section-header"><h1>How to Use</h1></div>
+        <div class="text-content">
+            <p>Follow these simple steps to generate professional verification documents in seconds.</p>
+            <ul class="step-list">
+                <li class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-desc"><span class="step-title">Select Document Type</span> Choose the type of document you need from the dropdown menu (e.g., Official Letter, ID Card, Pay Stub).</div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-desc"><span class="step-title">Enter Details</span> Fill in the form fields manually, or click the <strong>"Auto-Fill Random Data"</strong> button to populate sample information for testing.</div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-desc"><span class="step-title">Customize</span> If needed, upload a school logo or your photo (for ID cards). The preview updates in real-time.</div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-desc"><span class="step-title">Export</span> Once satisfied, use the buttons below the preview to <strong>Download PNG</strong>, <strong>Print/PDF</strong>, or <strong>Copy Text</strong>.</div>
+                </li>
+            </ul>
+            <div class="highlight-box">
+                <strong>Tip:</strong> For the best results when printing to PDF, ensure your browser's print settings have "Background graphics" enabled.
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ABOUT SECTION -->
+    <div id="section-about" class="page-section">
+        <div class="section-header"><h1>About Us</h1></div>
+        <div class="text-content">
+            <p>Welcome to <strong>ChatGPTDG</strong> (ChatGPT Documents Generator), the premier tool designed exclusively for the educational community.</p>
+            <h2>Our Mission</h2>
+            <p>Our mission is simple: <strong>To empower educators.</strong> In an increasingly digital world, teachers often face bureaucratic hurdles. The process of verifying employment or status to access tools like OpenAI's ChatGPT Educator Pilot can be cumbersome.</p>
+            <div class="highlight-box"><p><strong>We believe that verification should not be a barrier to innovation.</strong> Teachers should spend their time lesson planning and inspiring students, not fighting with formatting software.</p></div>
+            <h2>How It Works</h2>
+            <ul>
+                <li><strong>Privacy First:</strong> Data never leaves your device.</li>
+                <li><strong>Speed:</strong> Documents are generated instantly in your browser.</li>
+                <li><strong>Flexibility:</strong> We support multiple formats including Official Letters, ID Cards, Pay Stubs, and Certification Licenses.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. PRIVACY SECTION -->
+    <div id="section-privacy" class="page-section">
+        <div class="section-header"><h1>Privacy Policy</h1></div>
+        <div class="text-content">
+            <p style="font-style:italic;">Last Updated: December 2025</p>
+            <p>Welcome to the ChatGPT Documents Generator. Your privacy is critically important to us.</p>
+            <h2>1. Information We Collect</h2>
+            <p>We prioritize data minimization. ChatGPTDG is a client-side tool.</p>
+            <h3>a. Personal Data</h3>
+            <p>When you input information such as your name, school, or salary, <strong>we do not store this data on our servers.</strong> All generation happens locally in your browser.</p>
+            <h3>b. Uploaded Images</h3>
+            <p>If you upload a logo or photo, these files are processed locally in temporary memory and are not uploaded to any external cloud storage.</p>
+            <h2>2. Data Security</h2>
+            <p>Because we do not database your entry data, the risk of data breach from our end is virtually non-existent. Always use this tool on a secure, private device.</p>
+        </div>
+    </div>
+
+    <!-- 5. CONTACT SECTION -->
+    <div id="section-contact" class="page-section">
+        <div class="section-header"><h1>Contact Us</h1></div>
+        <div class="text-content" style="max-width: 600px;">
+            <p>Have a question? Need help? Fill out the form below.</p>
+            <form onsubmit="event.preventDefault(); alert('Message sent! (Demo Only)');">
+                <div class="form-group"><label>Full Name</label><input type="text" required></div>
+                <div class="form-group"><label>Email Address</label><input type="email" required></div>
+                <div class="form-group"><label>Message</label><textarea required></textarea></div>
+                <button type="submit" class="btn btn-copy" style="width:100%">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        &copy; 2025 ChatGPTDG. All rights reserved.
+    </footer>
+
+</div>
+
+<div id="toast">Text copied to clipboard!</div>
+
+<script>
+    // --- MENU LOGIC ---
+    function toggleMenu() {
+        document.getElementById('sideMenu').classList.toggle('open');
+        document.getElementById('menuOverlay').classList.toggle('open');
+    }
+
+    function switchPage(pageId, linkElement) {
+        // Hide all sections
+        document.querySelectorAll('.page-section').forEach(sec => section = sec.classList.remove('active'));
+        // Show target
+        const target = document.getElementById('section-' + pageId);
+        if(target) target.classList.add('active');
+        
+        // Update sidebar active state
+        if(linkElement) {
+            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+            linkElement.classList.add('active');
+        }
+        // Close menu
+        toggleMenu();
+    }
+
+    // --- GENERATOR LOGIC ---
+    function toggleTheme() {
+        const body = document.body;
+        const currentTheme = body.getAttribute('data-theme');
+        body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    const schools = ["Keystone High School", "Fairfax County Public Schools", "Lincoln Elementary School", "Washington Middle School", "Pleasant Valley School District"];
+    const departments = ["State of Indiana", "State of Texas", "California Dept of Education", "New York State Education Dept"];
+    const addresses = ["3200 N Main Avenue\nSan Antonio, TX 78212\nTel: (210) 735-4022", "4029 28th Ave S\nMinneapolis, MN 55406", "1234 School House Road\nAustin, TX 78701"];
+    const principals = ["Dr. Melissa Warren", "Mr. Robert Chen", "Ms. Sarah O'Connor", "Superintendent Michael Johnson"];
+    const teachers = ["Qupal Bosh", "Joshua Dillard", "Jessica Williams", "David Martinez", "Jennifer Smith"];
+    const titles = ["High School English and Social Studies Teacher", "K-12 Technology Specialist", "Special Education Teacher", "AP Chemistry Instructor"];
+    const useCases = ["differentiating reading passages", "creating quizzes aligned with State Standards", "drafting IEP goals", "generating substitute plans"];
+
+    let schoolLogoData = null;
+    let globalPayDate = "", globalPayPeriod = "", globalCurrentDate = "";
+
+    function generateRealisticDates() {
+        const today = new Date();
+        globalCurrentDate = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const payDateObj = new Date();
+        payDateObj.setDate(today.getDate() - (Math.floor(Math.random() * 20) + 10));
+        while(payDateObj.getDay() !== 5) { payDateObj.setDate(payDateObj.getDate() - 1); }
+        const payEndObj = new Date(payDateObj);
+        payEndObj.setDate(payDateObj.getDate() - 6); 
+        const payStartObj = new Date(payEndObj);
+        payStartObj.setDate(payEndObj.getDate() - 13); 
+        const opts = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        globalPayDate = payDateObj.toLocaleDateString('en-US', opts);
+        globalPayPeriod = `${payStartObj.toLocaleDateString('en-US', opts)} - ${payEndObj.toLocaleDateString('en-US', opts)}`;
+    }
+
+    function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function handleLogoUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) { schoolLogoData = e.target.result; updatePreview(); }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function toggleFields() {
+        const docType = document.getElementById('docType').value;
+        document.getElementById('useCaseGroup').style.display = 'none';
+        document.getElementById('addressGroup').style.display = 'block';
+        document.getElementById('recipientGroup').style.display = 'block';
+        document.getElementById('logoGroup').style.display = 'none'; 
+        document.getElementById('certFields').style.display = 'none';
+        document.getElementById('deptGroup').style.display = 'none';
+        document.getElementById('schoolGroup').style.display = 'block';
+        
+        document.getElementById('schoolNameLabel').innerText = "School/Institution Name";
+        document.getElementById('fileInputLabel').innerText = "School Logo (Optional)";
+        document.getElementById('recipientLabel').textContent = "Signatory Name (Head of School)";
+        document.getElementById('docBadge').textContent = "Accepted: Official Letter";
+
+        if (docType === 'whitelist') {
+            document.getElementById('useCaseGroup').style.display = 'block';
+            document.getElementById('addressGroup').style.display = 'none';
+            document.getElementById('recipientLabel').textContent = "To (IT Director / Principal)";
+            document.getElementById('docBadge').textContent = "Internal Proposal";
+        } else if (docType === 'certificate') {
+            document.getElementById('addressGroup').style.display = 'none';
+            document.getElementById('schoolGroup').style.display = 'none';
+            document.getElementById('deptGroup').style.display = 'block';
+            document.getElementById('certFields').style.display = 'block';
+            document.getElementById('logoGroup').style.display = 'block'; 
+            document.getElementById('fileInputLabel').innerText = "State/Department Seal";
+            document.getElementById('recipientLabel').innerText = "Superintendent of Instruction";
+            document.getElementById('docBadge').textContent = "Accepted: Teaching License";
+        } else if (docType === 'paystub') {
+            document.getElementById('recipientGroup').style.display = 'none';
+            document.getElementById('docBadge').textContent = "Accepted: Pay Slip (90 Days)";
+        } else if (docType === 'idcard') {
+            document.getElementById('recipientGroup').style.display = 'none';
+            document.getElementById('addressGroup').style.display = 'none';
+            document.getElementById('logoGroup').style.display = 'block'; 
+            document.getElementById('fileInputLabel').innerText = "Your Photo (Optional)";
+            document.getElementById('docBadge').textContent = "Accepted: Teacher ID";
+        }
+        updatePreview();
+    }
+
+    function randomizeData() {
+        generateRealisticDates();
+        const docType = document.getElementById('docType').value;
+        document.getElementById('schoolName').value = getRandom(schools);
+        document.getElementById('senderName').value = getRandom(teachers);
+        document.getElementById('senderTitle').value = getRandom(titles);
+        document.getElementById('schoolAddress').value = getRandom(addresses);
+        document.getElementById('recipientName').value = getRandom(principals);
+        if (docType === 'whitelist') document.getElementById('useCase').value = getRandom(useCases);
+        if (docType === 'certificate') {
+             document.getElementById('department').value = getRandom(departments);
+             document.getElementById('certLicense').value = Math.floor(10000000 + Math.random() * 90000000);
+             document.getElementById('certSPN').value = Math.floor(10000000 + Math.random() * 90000000);
+             document.getElementById('certIssued').value = "6/5/2017";
+             document.getElementById('certExpires').value = "6/5/2029";
+        }
+        updatePreview();
+    }
+
+    function updatePreview() {
+        const docType = document.getElementById('docType').value;
+        const recipient = document.getElementById('recipientName').value || '[Signatory Name]';
+        const sender = document.getElementById('senderName').value || '[Teacher Name]';
+        const title = document.getElementById('senderTitle').value || '[Title]';
+        const school = document.getElementById('schoolName').value || '[School Name]'; 
+        const address = document.getElementById('schoolAddress').value || '[Address Line 1]';
+        const formattedAddress = address.replace(/\n/g, '<br>');
+        
+        let safeSchoolName = school.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (safeSchoolName.length < 3) safeSchoolName = "schoolwebsite";
+        const schoolWebsite = `www.${safeSchoolName}.edu`;
+
+        const department = document.getElementById('department').value || 'State Department of Education';
+        const license = document.getElementById('certLicense').value || '00000000';
+        const spn = document.getElementById('certSPN').value || '00000000';
+        const issued = document.getElementById('certIssued').value || '--/--/----';
+        const expires = document.getElementById('certExpires').value || '--/--/----';
+
+        let htmlContent = '';
+        // USING THE TEACHER.PNG FILE
+        const defaultIdPic = "Teacher.png"; 
+        
+        let imgHtml = '';
+        if (schoolLogoData) imgHtml = `<img src="${schoolLogoData}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        else imgHtml = (docType === 'idcard') ? `<img src="${defaultIdPic}" style="width: 100%; height: 100%; object-fit: cover;">` : `<div style="font-size:40px;">👤</div>`;
+
+        if (docType === 'whitelist') {
+             htmlContent = `<div class="memo-title">Memorandum</div><div class="memo-header"><div><strong>To:</strong> ${recipient}</div><div><strong>From:</strong> ${sender}</div><div><strong>Date:</strong> ${globalCurrentDate}</div><div><strong>Subject:</strong> Request to unblock ChatGPT for official K-12 Educator Pilot</div></div><div class="memo-body"><p>Dear ${recipient},</p><p>I am writing to request that our district whitelist the domain <strong>chatgpt.com</strong> for faculty use.</p><p>I have verified my status as an educator. To utilize this tool for creating materials like ${title} lesson plans, I need access via our network.</p></div>`;
+        } else if (docType === 'paystub') {
+            htmlContent = `<div class="paystub-container"><div class="paystub-header"><div><div style="font-weight:bold; font-size:1.4em;">${school}</div><div style="color:#555; font-size:0.95em;">${formattedAddress}</div></div><div style="text-align:right;"><div class="paystub-title">Earnings Statement</div><div style="margin-top:5px;"><strong>Pay Date:</strong> ${globalPayDate}</div></div></div><div style="margin-bottom: 25px; display: flex; justify-content: space-between; background-color: #f8f9fa; padding: 15px; border: 1px solid #eee;"><div><strong>Employee Name:</strong><br>${sender}</div><div><strong>Job Title:</strong><br>${title}</div><div style="text-align:right;"><strong>Pay Period:</strong><br>${globalPayPeriod}</div></div><table class="paystub-table"><thead><tr><th>Description</th><th>Amount</th></tr></thead><tbody><tr><td>Regular Salary</td><td>$2,450.00</td></tr></tbody></table><div class="paystub-total">Net Pay: $1,714.50</div></div>`;
+        } else if (docType === 'idcard') {
+            htmlContent = `<div class="id-card-wrapper"><div class="id-card"><div class="id-left"><div class="id-photo">${imgHtml}</div></div><div class="id-right"><div class="id-school">${school}</div><div class="id-name">${sender}</div><div class="id-role">FACULTY / STAFF</div><div style="font-size:10px; color:#999; margin-top:5px;">ID: 8824-9921</div><div class="id-year">2025-2026</div></div></div></div>`;
+        } else if (docType === 'certificate') {
+            let certLogoHtml = schoolLogoData ? `<div class="cert-header-logo"><img src="${schoolLogoData}"></div>` : `<div class="cert-header-logo" style="font-size:50px;">🏛️</div>`;
+            let certWatermarkHtml = schoolLogoData ? `<div class="cert-watermark"><img src="${schoolLogoData}"></div>` : `<div class="cert-watermark"><div class="cert-watermark-text">STATE</div></div>`;
+            htmlContent = `<div class="cert-container">${certWatermarkHtml}<div class="cert-content">${certLogoHtml}<div class="cert-header-fancy">${department}</div><div class="cert-subheader">Professional Educator's License</div><div class="cert-name">${sender}</div><div class="cert-details"><div class="cert-col"><div class="cert-row"><span class="cert-label">SPN No.:</span> <span class="cert-val">${spn}</span></div><div class="cert-row"><span class="cert-label">License No:</span> <span class="cert-val">${license}</span></div><div class="cert-row"><span class="cert-label">Highest Degree:</span> <span class="cert-val">Bachelor</span></div></div><div class="cert-col"></div></div><table class="cert-table"><thead><tr><th>Instructional</th><th>Grade Coverage</th><th>Issued</th><th>Expires</th><th>Action</th></tr></thead><tbody><tr><td>${title}</td><td>5-12</td><td>${issued}</td><td>${expires}</td><td>Original</td></tr></tbody></table><div style="margin-top: 60px; text-align: left;"><div class="signature-placeholder" style="font-size: 20pt;">${recipient}</div><div style="border-top: 2px solid black; width: 250px; padding-top: 5px; font-weight: bold;">${recipient}<br><span style="font-weight: normal; font-size: 0.9em;">Superintendent of Public Instruction</span></div></div></div></div>`;
+        } else {
+            const statusText = docType === 'offer' ? "employment" : "currently employed and fully certified teacher";
+            const lastName = sender.split(" ").pop();
+            htmlContent = `<div class="letter-container"><div class="letter-head-block"><div class="letter-school-name">${school}</div><div class="letter-address">${formattedAddress}</div><div class="letter-address">${schoolWebsite}</div></div><div class="letter-date">Date: ${globalCurrentDate}</div><div class="letter-salutation">To Whom It May Concern,</div><div class="letter-body"><p>This letter is to verify that <strong>Mr./Ms. ${sender}</strong> is a <strong>${statusText}</strong> at <strong>${school}</strong>. Mr./Ms. ${lastName} has been an active member of our faculty since <strong>August 2021</strong>, serving as a <strong>${title}</strong>.</p><p>Mr./Ms. ${lastName} holds a valid <strong>Standard Teaching Certificate</strong> authorizing instruction for grades 9–12. Their professional conduct remains in good standing, and they continue to demonstrate excellence in curriculum development, student engagement, and educational innovation.</p><p>${school} is a fully accredited institution. This verification is issued upon the request of ${sender} for the purpose of confirming his professional educator status and eligibility for participation in the <strong>ChatGPT Educator Program</strong>. Please feel free to contact our administrative office for verification or further information.</p></div><div class="letter-signature-block"><div class="letter-salutation">Sincerely,</div><div class="signature-placeholder">${recipient}</div><div style="font-weight: bold;">${recipient}</div><div>Head of School</div><div>${school}</div></div></div>`;
+        }
+        document.getElementById('emailPreview').innerHTML = htmlContent;
+    }
+
+    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById("emailPreview").innerText).then(() => showToast()); }
+    function downloadPNG() { html2canvas(document.getElementById("emailPreview"), { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(c => { const l = document.createElement('a'); l.download = 'educator-document.png'; l.href = c.toDataURL("image/png"); document.body.appendChild(l); l.click(); document.body.removeChild(l); }); }
+    function showToast() { const x = document.getElementById("toast"); x.className = "show"; setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000); }
+    function resetForm() { document.getElementById('schoolName').value = ''; document.getElementById('recipientName').value = ''; document.getElementById('senderName').value = ''; document.getElementById('senderTitle').value = ''; document.getElementById('schoolAddress').value = ''; schoolLogoData = null; document.getElementById('logoUpload').value = ""; generateRealisticDates(); updatePreview(); }
+
+    generateRealisticDates();
+    toggleFields(); 
+</script>
+
+</body>
+</html>
