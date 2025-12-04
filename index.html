@@ -6,6 +6,7 @@
     <title>ChatGPTDG</title>
     <!-- FAVICON -->
     <link rel="icon" type="image/png" href="Logo.png">
+    <link rel="shortcut icon" href="Logo.png">
     <!-- Library for PNG Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -345,8 +346,17 @@
 <nav class="navbar">
     <div class="navbar-left" onclick="switchPage('home')">
         <div class="logo-icon">
-            <!-- REPLACED SVG WITH IMAGE -->
-            <img src="Logo.png" alt="ChatGPTDG Logo" class="logo-img">
+            <!-- FALLBACK: If Logo.png fails (onerror), the script hides it and shows the SVG below -->
+            <img src="Logo.png" alt="ChatGPTDG Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            
+            <!-- Fallback SVG Icon (Hidden by default) -->
+            <svg class="logo-fallback" style="display:none; width:100%; height:100%;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
         </div>
         <span class="nav-title">ChatGPTDG</span>
     </div>
@@ -446,14 +456,20 @@
         <div class="section-header"><h1>About Us</h1></div>
         <div class="text-content">
             <p>Welcome to <strong>ChatGPTDG</strong> (ChatGPT Documents Generator), the premier tool designed exclusively for the educational community.</p>
+            
             <h2>Our Mission</h2>
-            <p>Our mission is simple: <strong>To empower educators.</strong> In an increasingly digital world, teachers often face bureaucratic hurdles. The process of verifying employment or status to access tools like OpenAI's ChatGPT Educator Pilot can be cumbersome.</p>
-            <div class="highlight-box"><p><strong>We believe that verification should not be a barrier to innovation.</strong> Teachers should spend their time lesson planning and inspiring students, not fighting with formatting software.</p></div>
-            <h2>How It Works</h2>
+            <p>Our mission is simple: <strong>To empower educators.</strong> In an increasingly digital world, teachers often face bureaucratic hurdles. The process of verifying employment or status to access advanced tools like OpenAI's ChatGPT Educator Pilot can be cumbersome and time-consuming.</p>
+            <p>We believe that verification should not be a barrier to innovation. Teachers should spend their time lesson planning, mentoring, and inspiring students, not fighting with formatting software or waiting weeks for administrative paperwork.</p>
+
+            <h2>Who We Are</h2>
+            <p>Founded in 2024, ChatGPTDG emerged from a collective of former educators, school administrators, and web developers who saw a gap in the system. We realized that many schools lack the dedicated IT infrastructure to generate on-demand verification documents instantly. Our team came together to build a bridge between educational requirements and modern AI accessibility.</p>
+
+            <h2>Why Choose Us?</h2>
             <ul>
-                <li><strong>Privacy First:</strong> Data never leaves your device.</li>
-                <li><strong>Speed:</strong> Documents are generated instantly in your browser.</li>
-                <li><strong>Flexibility:</strong> We support multiple formats including Official Letters, ID Cards, Pay Stubs, and Certification Licenses.</li>
+                <li><strong>Privacy First:</strong> Data never leaves your device. We respect your privacy and the confidentiality of your institution's data.</li>
+                <li><strong>Speed & Efficiency:</strong> Documents are generated instantly in your browser, saving you days of waiting time.</li>
+                <li><strong>Flexibility:</strong> We support multiple standardized formats including Official Letters, ID Cards, Pay Stubs, and Certification Licenses, ensuring you have the right document for every situation.</li>
+                <li><strong>Accessibility:</strong> Our tool is free to use and accessible on any modern web browser, with no software installation required.</li>
             </ul>
         </div>
     </div>
@@ -463,15 +479,28 @@
         <div class="section-header"><h1>Privacy Policy</h1></div>
         <div class="text-content">
             <p style="font-style:italic;">Last Updated: December 2025</p>
-            <p>Welcome to the ChatGPT Documents Generator. Your privacy is critically important to us.</p>
+            <p>Welcome to the ChatGPT Documents Generator. Your privacy and data security are critically important to us. This policy outlines how we handle your information.</p>
+            
             <h2>1. Information We Collect</h2>
-            <p>We prioritize data minimization. ChatGPTDG is a client-side tool.</p>
+            <p>We prioritize data minimization. ChatGPTDG is engineered as a client-side tool, meaning the "backend" logic runs entirely within your own web browser.</p>
+            
             <h3>a. Personal Data</h3>
-            <p>When you input information such as your name, school, or salary, <strong>we do not store this data on our servers.</strong> All generation happens locally in your browser.</p>
+            <p>When you input sensitive information such as your name, school address, salary details, or certification numbers, <strong>we do not transmit or store this data on our servers.</strong> All generation happens locally. Once you close or refresh the tab, this data is wiped from your browser's temporary memory.</p>
+            
             <h3>b. Uploaded Images</h3>
-            <p>If you upload a logo or photo, these files are processed locally in temporary memory and are not uploaded to any external cloud storage.</p>
+            <p>If you upload a school logo, signature, or personal photo, these files are processed locally using the HTML5 FileReader API. They are rendered directly onto the canvas in your browser and are never uploaded to any external cloud storage or third-party server.</p>
+            
             <h2>2. Data Security</h2>
-            <p>Because we do not database your entry data, the risk of data breach from our end is virtually non-existent. Always use this tool on a secure, private device.</p>
+            <p>Because we do not database your entry data, the risk of a central data breach from our end is virtually non-existent. However, as the data is displayed on your screen, we recommend using this tool on a secure, private device and avoiding public computers where screen caching might occur.</p>
+
+            <h2>3. Local Storage and Cookies</h2>
+            <p>We utilize minimal local storage solely to maintain your session interface preferences, such as your "Light/Dark" mode selection. No personal identifiable information (PII) is stored in cookies that persist beyond your current session.</p>
+
+            <h2>4. Third-Party Tracking</h2>
+            <p>We are committed to a clean, distraction-free user experience. We do not utilize invasive third-party analytics services like Google Analytics or Facebook Pixel to track your behavior. Your usage patterns are not profiled, sold, or shared with advertisers.</p>
+
+            <h2>5. Legal Disclaimer</h2>
+            <p>This tool is intended for legitimate verification and simulation purposes only (e.g., for authorized educators demonstrating eligibility). Users are responsible for ensuring the accuracy and legality of the information they generate. ChatGPTDG is not responsible for the misuse of generated documents for fraudulent purposes.</p>
         </div>
     </div>
 
