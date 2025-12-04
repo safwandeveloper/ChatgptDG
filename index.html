@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatGPTDG</title>
     <!-- FAVICON -->
-    <link rel="icon" type="image/png" href="Logo.png">
-    <link rel="shortcut icon" href="Logo.png">
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="shortcut icon" href="Favicon.png">
     <!-- Library for PNG Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -281,6 +281,20 @@
         .cert-table td { padding: 8px 5px; border-bottom: 1px solid #eee; }
         .preview-label { font-weight: bold; margin-bottom: 15px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 
+        /* HIDDEN SEO KEYWORD STYLE */
+        .seo-keywords {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+            visibility: hidden;
+        }
+
         @media (max-width: 768px) {
             .generator-content { flex-direction: column; }
             .input-section { flex: none; border-right: none; border-bottom: 1px solid var(--border); max-height: none; }
@@ -346,8 +360,8 @@
 <nav class="navbar">
     <div class="navbar-left" onclick="switchPage('home')">
         <div class="logo-icon">
-            <!-- FALLBACK: If Logo.png fails (onerror), the script hides it and shows the SVG below -->
-            <img src="Logo.png" alt="ChatGPTDG Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <!-- FALLBACK: If Favicon.png fails (onerror), the script hides it and shows the SVG below -->
+            <img src="Favicon.png" alt="ChatGPTDG Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             
             <!-- Fallback SVG Icon (Hidden by default) -->
             <svg class="logo-fallback" style="display:none; width:100%; height:100%;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -525,6 +539,13 @@
 </div>
 
 <div id="toast">Text copied to clipboard!</div>
+
+<!-- INVISIBLE SEO KEYWORDS -->
+<div class="seo-keywords">
+    chatgpt k12, k12 document generator, verification letter generator, student verification, school document generator, ai education tools, chatbot for schools, ai document creator, online school forms, k12 certificate generator, digital education tools, automated paperwork, school enrollment verification, transcript generator, student id verification, school document automation, k12 proof of enrollment, ai school assistant, online student verification, education document templates, digital learning assistant, k12 school portal, parent verification forms, student certificate maker, ai-powered documents, academic verification generator, teacher ai tools, school document system, education workflow automation, classroom ai assistant, learning platform tools, academic paperwork generator, k12 admissions documents, proof of study generator, education form creator, school administrative tools, online document builder, k12 compliance documents, digital records generator, school letter generator, automated school forms, online verification letters, ai report generator, teacher productivity tool, student progress documents, custom school documents, official letter generator, academic certificate maker, ai for education admin, k12 documentation portal, school registration forms, teacher workflow automation, academic form generator, automated certificate creator, digital verification tool, online transcript maker, school letter automation, ai assistant for teachers, remote learning documents, student attendance verification, school official documents, academic history generator, parent-teacher support tool, education automation suite, k12 workflow system, document generation website, ai-powered school platform, online certification generator, k12 education management, student info verification, school compliance forms, teaching automation tools, online learning documentation, classroom paperwork generator, academic record creator, school communication letters, ai education website, digital school assistant, academic notice creator, school email generator, ai enrollment tools, k12 school verification, online education documents, student academic proof, digital certificate engine, automated proof of enrollment, student info sheet generator, learning verification letters, teacher documentation tool, school online generator, education tech platform, document automation for k12, chatgpt document tool, academic pdf generator.
+    student statement generator, online teacher tools, school staff letters, education record templates, ai school letter writer, academic recommendation generator, electronic school forms, k12 admin tools, automated academic letters, official school notices, automated graduation letter, attendance certificate generator, education output generator, digital enrollment assistant, academic validation generator, college-bound student docs, school internet tools, educational ai generator, k12 online portal keywords, teaching paperwork tool, school forms wizard, academic file generator, parent communication letters, classroom management ai, documentation automation engine, school system tools, online admin tools for teachers, academic portfolio generator, grading assistant ai, academic documentation suite, staff verification letters, technology in education, digital academic assistant, ai-enhanced school portals, online letter drafting tool, k12 documentation wizard, certificate template generator, automated record creator, report card generator, performance letter generator, education analytics assistant, school website toolkit, cloud document generator, student data verification, curriculum documents generator, customizable school documents, streamlined education admin, administrative ai helper, digital k12 documentation, automated school paperwork, academic pdf builder, online school proof forms, ai document creation engine, school automation workflow, digital identity school docs, parent receipt generator, enrollment letter tool, school certificate automation, k12 reporting tools, student compliance docs, homeroom assistant ai, subject report generator, k12 digital forms, transcript summary generator, student record builder, proof of residency school form, school tech ai, online education paperwork, teaching assistant web tool, k12 system integration, academic referencing generator, formal school letter template, official k12 generator, automated discipline forms, academic consent forms, school verification automation, electronic student records, automated k12 documents.
+    k12 resource generator, chatgpt academic helper, online academic writing generator, school template kit, k12 validation letters, school-based automation, ai for student records, digital data verification, education credential generator, k12 online assistant, student success documents, teacher credentials generator, k12 paperwork maker, custom education letters, lesson documentation generator, student support document generator, school readiness letters, k12 verification toolkit, ai documentation web app, proof of course completion generator, school program verification, content generator for educators, academic administration tools, digital school forms generator, ai school producer, student report builder, academic letter editor, online automated writer, education digital services, school cloud system generator, digital assistant school admin, online education verification, student letter automation, ai letter generation platform, web-based document generator, k12 workflow assistant, school organization tools, digital certificate designer, academic compliance verification, ai-driven school forms, electronic school paperwork, student audit documents, teacher evaluation generator, k12 portal enhancement, education Technology generator, academic operations assistant, digital study verification, school program paperwork, enrollment verification service.
+</div>
 
 <script>
     // --- MENU LOGIC ---
